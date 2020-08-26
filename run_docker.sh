@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-until nvidia-docker ps
+until docker ps
 do
     echo "Waiting for docker server"
     sleep 1
@@ -9,7 +9,7 @@ done
 
 # Make sure processes in the container can connect to the x server
 # Necessary so rviz can create a context for OpenGL rendering
-XAUTH=/home/***/.docker.xauth #input your path
+XAUTH=/home/nqrobot/.docker.xauth #input your path
 if [ ! -f $XAUTH ]
 then
     xauth_list=$(xauth nlist :0 | sed -e 's/^..../ffff/')
@@ -34,13 +34,13 @@ fi
 #   --rm=true \
 #   --net=host \
 #   hyye/lio
-
-nvidia-docker run -it \
+docker run -it \
     -e DISPLAY=$DISPLAY \
     -e QT_X11_NO_MITSHM=1 \
     -e XAUTHORITY=$XAUTH \
     -v "$XAUTH:$XAUTH" \
     --user=$USER \
+    --volume="/home/nqrobot/hejie_document/docker_file/ros1:/home/nqrobot/" \
     --volume="/etc/group:/etc/group:ro" \
     --volume="/etc/passwd:/etc/passwd:ro" \
     --volume="/etc/shadow:/etc/shadow:ro" \
@@ -49,5 +49,5 @@ nvidia-docker run -it \
     --privileged \
     --rm=false \
     --net=host \
-    robot:base1.0 \  #input your images
+    hejie/slam:latest  \  #input your images
     /bin/bash   # you can use -c + "" to run some init bash
